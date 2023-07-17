@@ -15,4 +15,20 @@ export const changeUserInput = new GraphQLInputObjectType({
         balance: { type: GraphQLFloat },
     }
 })
+export const createPostInput = new GraphQLInputObjectType({
+    name: "CreatePostInput",
+    fields: {
+        title: { type: GraphQLString },
+        content: { type: GraphQLFloat },
+        authorId: { type: UUIDType }
+    }
+})
+export const changePostInput = new GraphQLInputObjectType({
+    name: "ChangePostInput",
+    fields: {
+        title: { type: GraphQLString },
+        content: { type: GraphQLFloat },
+        authorId: { type: UUIDType }
+    }
+})
 

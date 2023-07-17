@@ -1,7 +1,7 @@
 import { GraphQLFloat, GraphQLObjectType, GraphQLString } from 'graphql';
-import { UserType } from '../queries/scheme.js';
+import { PostType, UserType } from '../queries/scheme.js';
 import { prisma } from '../schemas.js';
-import { changeUserInput, createUserInput } from './scheme.js';
+import { changePostInput, changeUserInput, createPostInput, createUserInput } from './scheme.js';
 import { UUIDType } from '../types/uuid.js';
 
 export const Mutation = new GraphQLObjectType({
@@ -45,6 +45,44 @@ export const Mutation = new GraphQLObjectType({
                     where: { id: args.id }
                 })
             }
-        }
+        },
+
+        createPost: {
+            type: PostType,
+            args: {
+                dto: {
+                    type: createPostInput
+                }
+            },
+            async resolve(parent, args) {
+                return await prisma.post.create({ data: { title: args.dto.title, content: args.dto.content, authorId: args.dto.authorId } })
+            }
+        },
+        changePost: {
+            type: PostType,
+            args: {
+                id: { type: UUIDType },
+                dto: {
+                    type: changePostInput
+                }
+            },
+            async resolve(parent, args) {
+                return await prisma.post.update({
+                    where: { id: args.id },
+                    data: { title: args.dto.title, content: args.dto.content, authorId: args.dto.authorId }
+                })
+            }
+        },
+        deletePost: {
+            type: PostType,
+            args: {
+                id: { type: UUIDType }
+            },
+            async resolve(parent, args) {
+                return await prisma.post.delete({
+                    where: { id: args.id }
+                })
+            }
+        },
     })
 })
