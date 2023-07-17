@@ -21,10 +21,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         schema: schema,
         source: req.body.query,
         variableValues: req.body.variables,
-        /*  contextValue: {
-           fastify,
-           dataLoader: getDataLoaders(fastify),
-         }, */
+
       })
       return res;
 
@@ -36,3 +33,8 @@ export default plugin;
 
 
 //validationRules: [depthLimit(5)]
+
+/*  contextValue: {
+   fastify,
+   dataLoader: getDataLoaders(fastify),
+ }, */
