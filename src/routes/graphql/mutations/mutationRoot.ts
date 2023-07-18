@@ -1,7 +1,7 @@
 import { GraphQLFloat, GraphQLObjectType, GraphQLString } from 'graphql';
-import { PostType, UserType } from '../queries/scheme.js';
+import { PostType, ProfileType, UserType } from '../queries/scheme.js';
 import { prisma } from '../schemas.js';
-import { changePostInput, changeUserInput, createPostInput, createUserInput } from './scheme.js';
+import { changePostInput, changeProfileInput, changeUserInput, createPostInput, createProfileInput, createUserInput } from './scheme.js';
 import { UUIDType } from '../types/uuid.js';
 
 export const Mutation = new GraphQLObjectType({
@@ -13,8 +13,6 @@ export const Mutation = new GraphQLObjectType({
                 dto: {
                     type: createUserInput
                 }
-                /* name: { type: GraphQLString },
-                balance: { type: GraphQLFloat }, */
             },
             async resolve(parent, args) {
                 return await prisma.user.create({ data: { name: args.dto.name, balance: args.dto.balance } })
@@ -36,12 +34,12 @@ export const Mutation = new GraphQLObjectType({
             }
         },
         deleteUser: {
-            type: UserType,
+            type: GraphQLString,
             args: {
                 id: { type: UUIDType }
             },
             async resolve(parent, args) {
-                return await prisma.user.delete({
+                await prisma.user.delete({
                     where: { id: args.id }
                 })
             }
@@ -74,15 +72,87 @@ export const Mutation = new GraphQLObjectType({
             }
         },
         deletePost: {
-            type: PostType,
+            type: GraphQLString,
             args: {
                 id: { type: UUIDType }
             },
             async resolve(parent, args) {
-                return await prisma.post.delete({
+                await prisma.post.delete({
                     where: { id: args.id }
                 })
             }
         },
+
+        createProfile: {
+            type: ProfileType,
+            args: {
+                dto: {
+                    type: createProfileInput
+                }
+            },
+            async resolve(parent, args) {
+                return await prisma.profile.create({ data: { isMale: args.dto.isMale, yearOfBirth: args.dto.yearOfBirth, memberTypeId: args.dto.memberTypeId, userId: args.dto.userId } })
+            }
+        },
+        changeProfile: {
+            type: ProfileType,
+            args: {
+                id: { type: UUIDType },
+                dto: {
+                    type: changeProfileInput
+                }
+            },
+            async resolve(parent, args) {
+                return await prisma.profile.update({
+                    where: { id: args.id },
+                    data: { isMale: args.dto.isMale, yearOfBirth: args.dto.yearOfBirth, memberTypeId: args.dto.memberTypeId }
+                })
+            }
+        },
+        deleteProfile: {
+            type: GraphQLString,
+            args: {
+                id: { type: UUIDType }
+            },
+            async resolve(parent, args) {
+                await prisma.profile.delete({
+                    where: { id: args.id }
+                })
+            }
+        },
+
+        subscribeTo: {
+            type: UserType,
+            args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
+            async resolve(parent, args) {
+                return await prisma.user.update({
+                    where: { id: args.userId },
+                    data: {
+                        userSubscribedTo: {
+                            create: {
+                                authorId: args.authorId,
+                            },
+                        },
+                    },
+                })
+            }
+        },
+
+        unsubscribeFrom: {
+            type: GraphQLString,
+            args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
+            async resolve(parent, args) {
+                await prisma.user.update({
+                    where: { id: args.userId },
+                    data: {
+                        userSubscribedTo: {
+                            deleteMany: {
+                                authorId: args.authorId,
+                            },
+                        },
+                    },
+                })
+            }
+        }
     })
 })
