@@ -1,6 +1,6 @@
 import { GraphQLFloat, GraphQLObjectType, GraphQLString } from 'graphql';
 import { PostType, ProfileType, UserType } from '../queries/scheme.js';
-import { prisma } from '../schemas.js';
+
 import { changePostInput, changeProfileInput, changeUserInput, createPostInput, createProfileInput, createUserInput } from './scheme.js';
 import { UUIDType } from '../types/uuid.js';
 
@@ -14,8 +14,8 @@ export const Mutation = new GraphQLObjectType({
                     type: createUserInput
                 }
             },
-            async resolve(parent, args) {
-                return await prisma.user.create({ data: { name: args.dto.name, balance: args.dto.balance } })
+            async resolve(parent, args, context) {
+                return await context.prisma.user.create({ data: { name: args.dto.name, balance: args.dto.balance } })
             }
         },
         changeUser: {
@@ -26,8 +26,8 @@ export const Mutation = new GraphQLObjectType({
                     type: changeUserInput
                 }
             },
-            async resolve(parent, args) {
-                return await prisma.user.update({
+            async resolve(parent, args, context) {
+                return await context.prisma.user.update({
                     where: { id: args.id },
                     data: { name: args.dto.name, balance: args.dto.balance }
                 })
@@ -38,8 +38,8 @@ export const Mutation = new GraphQLObjectType({
             args: {
                 id: { type: UUIDType }
             },
-            async resolve(parent, args) {
-                await prisma.user.delete({
+            async resolve(parent, args, context) {
+                await context.prisma.user.delete({
                     where: { id: args.id }
                 })
             }
@@ -52,8 +52,8 @@ export const Mutation = new GraphQLObjectType({
                     type: createPostInput
                 }
             },
-            async resolve(parent, args) {
-                return await prisma.post.create({ data: { title: args.dto.title, content: args.dto.content, authorId: args.dto.authorId } })
+            async resolve(parent, args, context) {
+                return await context.prisma.post.create({ data: { title: args.dto.title, content: args.dto.content, authorId: args.dto.authorId } })
             }
         },
         changePost: {
@@ -64,8 +64,8 @@ export const Mutation = new GraphQLObjectType({
                     type: changePostInput
                 }
             },
-            async resolve(parent, args) {
-                return await prisma.post.update({
+            async resolve(parent, args, context) {
+                return await context.prisma.post.update({
                     where: { id: args.id },
                     data: { title: args.dto.title, content: args.dto.content, authorId: args.dto.authorId }
                 })
@@ -76,8 +76,8 @@ export const Mutation = new GraphQLObjectType({
             args: {
                 id: { type: UUIDType }
             },
-            async resolve(parent, args) {
-                await prisma.post.delete({
+            async resolve(parent, args, context) {
+                await context.prisma.post.delete({
                     where: { id: args.id }
                 })
             }
@@ -90,8 +90,8 @@ export const Mutation = new GraphQLObjectType({
                     type: createProfileInput
                 }
             },
-            async resolve(parent, args) {
-                return await prisma.profile.create({ data: { isMale: args.dto.isMale, yearOfBirth: args.dto.yearOfBirth, memberTypeId: args.dto.memberTypeId, userId: args.dto.userId } })
+            async resolve(parent, args, context) {
+                return await context.prisma.profile.create({ data: { isMale: args.dto.isMale, yearOfBirth: args.dto.yearOfBirth, memberTypeId: args.dto.memberTypeId, userId: args.dto.userId } })
             }
         },
         changeProfile: {
@@ -102,8 +102,8 @@ export const Mutation = new GraphQLObjectType({
                     type: changeProfileInput
                 }
             },
-            async resolve(parent, args) {
-                return await prisma.profile.update({
+            async resolve(parent, args, context) {
+                return await context.prisma.profile.update({
                     where: { id: args.id },
                     data: { isMale: args.dto.isMale, yearOfBirth: args.dto.yearOfBirth, memberTypeId: args.dto.memberTypeId }
                 })
@@ -114,8 +114,8 @@ export const Mutation = new GraphQLObjectType({
             args: {
                 id: { type: UUIDType }
             },
-            async resolve(parent, args) {
-                await prisma.profile.delete({
+            async resolve(parent, args, context) {
+                await context.prisma.profile.delete({
                     where: { id: args.id }
                 })
             }
@@ -124,8 +124,8 @@ export const Mutation = new GraphQLObjectType({
         subscribeTo: {
             type: UserType,
             args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
-            async resolve(parent, args) {
-                return await prisma.user.update({
+            async resolve(parent, args, context) {
+                return await context.prisma.user.update({
                     where: { id: args.userId },
                     data: {
                         userSubscribedTo: {
@@ -141,8 +141,8 @@ export const Mutation = new GraphQLObjectType({
         unsubscribeFrom: {
             type: GraphQLString,
             args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
-            async resolve(parent, args) {
-                await prisma.subscribersOnAuthors.delete({
+            async resolve(parent, args, context) {
+                await context.prisma.subscribersOnAuthors.delete({
                     where: {
                         subscriberId_authorId: {
                             subscriberId: args.userId,

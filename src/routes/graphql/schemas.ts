@@ -1,14 +1,10 @@
 import { Type } from '@fastify/type-provider-typebox';
-import { PrismaClient } from '@prisma/client';
 
-import { GraphQLBoolean, GraphQLFloat, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql';
-import { UUIDType } from './types/uuid.js';
-import { MemberTypeId } from './types/memberTypeId.js';
-import { UserType, PostType, ProfileType, MemberType } from './queries/scheme.js';
+import { GraphQLSchema } from 'graphql';
 import { RootQuery } from './queries/rootQuery.js';
 import { Mutation } from './mutations/mutationRoot.js';
 
-export const prisma = new PrismaClient();
+
 
 export const gqlResponseSchema = Type.Partial(
   Type.Object({
