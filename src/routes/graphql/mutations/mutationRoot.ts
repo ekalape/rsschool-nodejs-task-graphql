@@ -142,16 +142,15 @@ export const Mutation = new GraphQLObjectType({
             type: GraphQLString,
             args: { userId: { type: UUIDType }, authorId: { type: UUIDType } },
             async resolve(parent, args) {
-                await prisma.user.update({
-                    where: { id: args.userId },
-                    data: {
-                        userSubscribedTo: {
-                            deleteMany: {
-                                authorId: args.authorId,
-                            },
+                await prisma.subscribersOnAuthors.delete({
+                    where: {
+                        subscriberId_authorId: {
+                            subscriberId: args.userId,
+                            authorId: args.authorId,
                         },
                     },
-                })
+                });
+
             }
         }
     })

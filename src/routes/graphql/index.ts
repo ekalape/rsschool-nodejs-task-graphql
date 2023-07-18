@@ -31,3 +31,10 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
 
 export default plugin;
 
+
+//validationRules: [depthLimit(5)]
+
+/*  contextValue: {
+   fastify,
+   dataLoader: getDataLoaders(fastify),
+ }, */
