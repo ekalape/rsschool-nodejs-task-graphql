@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLInt, GraphQLBoolean } from 'graphql'
-import { MemberTypeId } from '../types/memberTypeId.js'
-import { UUIDType } from '../types/uuid.js'
+import { MemberTypeId } from './types/memberTypeId.js'
+import { UUIDType } from './types/uuid.js'
 
 
 
@@ -13,27 +13,30 @@ export const UserType = new GraphQLObjectType({
         profile: {
             type: ProfileType,
             async resolve(parent, args, context) {
-                return await context.prisma.profile.findUnique({
+                return await context.dataLoader.profiles.load(parent.id)
+                /* return await context.prisma.profile.findUnique({
                     where: {
                         userId: parent.id
                     }
-                })
+                }) */
             }
         },
         posts: {
             type: new GraphQLList(PostType),
             async resolve(parent, args, context) {
-                return await context.prisma.post.findMany({
+                return await context.dataLoader.posts.load(parent.id)
+                /* return await context.prisma.post.findMany({
                     where: {
                         authorId: parent.id
                     }
-                })
+                }) */
             }
         },
         userSubscribedTo: {
             type: new GraphQLList(UserType),
             async resolve(parent, args, context) {
-                return await context.prisma.user.findMany({
+                return await context.dataLoader.subscribedTo.load(parent.id)
+                /* return await context.prisma.user.findMany({
                     where: {
                         subscribedToUser: {
                             some: {
@@ -41,13 +44,14 @@ export const UserType = new GraphQLObjectType({
                             },
                         },
                     },
-                })
+                }) */
             }
         },
         subscribedToUser: {
             type: new GraphQLList(UserType),
             async resolve(parent, args, context) {
-                return context.prisma.user.findMany({
+                return await context.dataLoader.subscribedToUser.load(parent.id)
+                /* return context.prisma.user.findMany({
                     where: {
                         userSubscribedTo: {
                             some: {
@@ -55,7 +59,7 @@ export const UserType = new GraphQLObjectType({
                             },
                         }
                     }
-                })
+                }) */
             }
         },
 
@@ -70,11 +74,8 @@ export const MemberType = new GraphQLObjectType({
         profiles: {
             type: new GraphQLList(ProfileType),
             async resolve(parent, args, context) {
-                return await context.prisma.profile.findMany({
-                    where: {
-                        memberTypeId: parent.id
-                    }
-                })
+                return await context.dataLoader.profiles.load(parent.id)
+
             }
         }
     })
@@ -90,21 +91,19 @@ export const ProfileType = new GraphQLObjectType({
         user: {
             type: UserType,
             async resolve(parent, args, context) {
-                return await context.prisma.user.findUnique({
-                    where: {
-                        id: parent.userId,
-                    },
-                })
+                return await context.dataLoader.users.load(parent.userId)
+
             }
         },
         memberType: {
             type: MemberType,
             async resolve(parent, args, context) {
-                return await context.prisma.memberType.findUnique({
-                    where: {
-                        id: parent.memberTypeId,
-                    },
-                })
+                return await context.dataLoader.memberTypes.load(parent.memberTypeId)
+                /*   return await context.prisma.memberType.findUnique({
+                      where: {
+                          id: parent.memberTypeId,
+                      },
+                  }) */
             }
         }
 
@@ -130,11 +129,8 @@ export const PostType = new GraphQLObjectType({
         author: {
             type: UserType,
             async resolve(parent, context) {
-                return await context.prisma.user.findUnique({
-                    where: {
-                        id: parent.authorId,
-                    },
-                })
+                return await context.dataLoader.users.load(parent.authorId)
+
             }
         }
     })

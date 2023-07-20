@@ -1,5 +1,5 @@
 import { GraphQLFloat, GraphQLObjectType, GraphQLString } from 'graphql';
-import { PostType, ProfileType, UserType } from '../queries/scheme.js';
+import { PostType, ProfileType, UserType } from '../graphQLSchemas.js';
 
 import { changePostInput, changeProfileInput, changeUserInput, createPostInput, createProfileInput, createUserInput } from './scheme.js';
 import { UUIDType } from '../types/uuid.js';
