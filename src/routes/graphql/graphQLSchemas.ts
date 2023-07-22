@@ -1,7 +1,7 @@
 import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLInt, GraphQLBoolean } from 'graphql'
 import { MemberTypeId } from './types/memberTypeId.js'
 import { UUIDType } from './types/uuid.js'
-
+import { FieldsByTypeName, ResolveTree, parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from 'graphql-parse-resolve-info';
 
 
 export const UserType = new GraphQLObjectType({
@@ -14,52 +14,45 @@ export const UserType = new GraphQLObjectType({
             type: ProfileType,
             async resolve(parent, args, context) {
                 return await context.dataLoader.profiles.load(parent.id)
-                /* return await context.prisma.profile.findUnique({
-                    where: {
-                        userId: parent.id
-                    }
-                }) */
             }
         },
         posts: {
             type: new GraphQLList(PostType),
             async resolve(parent, args, context) {
                 return await context.dataLoader.posts.load(parent.id)
-                /* return await context.prisma.post.findMany({
-                    where: {
-                        authorId: parent.id
-                    }
-                }) */
             }
         },
         userSubscribedTo: {
             type: new GraphQLList(UserType),
-            async resolve(parent, args, context) {
-                return await context.dataLoader.subscribedTo.load(parent.id)
-                /* return await context.prisma.user.findMany({
-                    where: {
-                        subscribedToUser: {
-                            some: {
-                                subscriberId: parent.id,
-                            },
-                        },
-                    },
-                }) */
+            async resolve(parent, args, context, info) {
+                /*                 const parsedResolveInfoFragment = parseResolveInfo(info);
+                                console.log("parsedResolveInfoFragment userTo >>> ", parsedResolveInfoFragment)
+                                const subIds: string[] = parent.subscribedToUser.map((s: { subscriberId: string, authorId: string }) => s.authorId)
+                                for (let sub of subIds) {
+                                    const subUser = await context.dataLoader.users.load(sub);
+                                    context.dataLoader.users.prime(sub, subUser);
+                                } */
+
+                return await context.dataLoader.userSubscribedTo.load(parent.id);
+
             }
         },
         subscribedToUser: {
             type: new GraphQLList(UserType),
-            async resolve(parent, args, context) {
-                return await context.dataLoader.subscribedToUser.load(parent.id)
-                /* return context.prisma.user.findMany({
-                    where: {
-                        userSubscribedTo: {
-                            some: {
-                                authorId: parent.id,
-                            },
-                        }
-                    }
-                }) */
+            async resolve(parent, args, context, info) {
+                /*                 const parsedResolveInfoFragment = parseResolveInfo(info);
+                                const fields = parsedResolveInfoFragment?.fieldsByTypeName
+                                console.log("parsedResolveInfoFragment subToUser >>> ", parsedResolveInfoFragment)
+                                console.log("fields ---------- ", fields);
+                                const subIds: string[] = parent.userSubscribedTo.map((s: { subscriberId: string, authorId: string }) => s.subscriberId)
+                                for (let sub of subIds) {
+                                    const subUser = await context.dataLoader.users.load(sub);
+                                    context.dataLoader.userSubscribedTo.prime(parent.id, parent.userSubscribedTo.push(sub));
+                                }
+                                console.log("PARENT subsIDs------>>> ", subIds) */
+
+
+                return await context.dataLoader.subscribedToUser.load(parent.id);
             }
         },
 
@@ -99,11 +92,6 @@ export const ProfileType = new GraphQLObjectType({
             type: MemberType,
             async resolve(parent, args, context) {
                 return await context.dataLoader.memberTypes.load(parent.memberTypeId)
-                /*   return await context.prisma.memberType.findUnique({
-                      where: {
-                          id: parent.memberTypeId,
-                      },
-                  }) */
             }
         }
 

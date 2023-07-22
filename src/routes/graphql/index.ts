@@ -5,9 +5,8 @@ import depthLimit from 'graphql-depth-limit';
 import { createLoaders } from './dataLoader/useDataLoader.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
-  const { prisma } = fastify
-  console.log("fastify ---> ", JSON.stringify(fastify))
-
+  const { prisma } = fastify;
+  const dataLoader = createLoaders(fastify)
   fastify.route({
     url: '/',
     method: 'POST',
@@ -27,7 +26,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         schema: schema,
         source: req.body.query,
         variableValues: req.body.variables,
-        contextValue: { prisma, dataLoader: createLoaders(fastify) }
+        contextValue: { prisma, dataLoader }
       })
       return result;
     },

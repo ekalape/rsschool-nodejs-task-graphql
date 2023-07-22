@@ -44,7 +44,7 @@ export function createLoaders(fastify: FastifyInstance) {
 
         }),
 
-        subscribedTo: new DataLoader(async (ids: readonly string[]) => {
+        userSubscribedTo: new DataLoader(async (ids: readonly string[]) => {
             const allsubs = await prisma.user.findMany({
                 where: {
                     subscribedToUser: {
@@ -52,9 +52,8 @@ export function createLoaders(fastify: FastifyInstance) {
                             subscriberId: { in: ids as string[] },
                         },
                     },
-                }, include: { subscribedToUser: { select: { subscriberId: true } } }
+                }, include: { subscribedToUser: true, userSubscribedTo: true }
             })
-
 
             return ids.map((id) => allsubs.filter((sub) => sub.subscribedToUser.some((s) => s.subscriberId === id)))
 
@@ -67,7 +66,7 @@ export function createLoaders(fastify: FastifyInstance) {
                             authorId: { in: ids as string[] },
                         },
                     },
-                }, include: { userSubscribedTo: { select: { authorId: true } } }
+                }, include: { userSubscribedTo: true, subscribedToUser: true }
             })
 
             return ids.map((id) => allsubs.filter((sub) => sub.userSubscribedTo.some((s) => s.authorId === id)))
