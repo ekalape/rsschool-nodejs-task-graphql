@@ -1,8 +1,6 @@
 import { GraphQLObjectType, GraphQLString, GraphQLFloat, GraphQLList, GraphQLInt, GraphQLBoolean } from 'graphql'
 import { MemberTypeId } from './types/memberTypeId.js'
 import { UUIDType } from './types/uuid.js'
-import { FieldsByTypeName, ResolveTree, parseResolveInfo, simplifyParsedResolveInfoFragmentWithType } from 'graphql-parse-resolve-info';
-
 
 export const UserType = new GraphQLObjectType({
     name: "user",
@@ -25,14 +23,6 @@ export const UserType = new GraphQLObjectType({
         userSubscribedTo: {
             type: new GraphQLList(UserType),
             async resolve(parent, args, context, info) {
-                /*                 const parsedResolveInfoFragment = parseResolveInfo(info);
-                                console.log("parsedResolveInfoFragment userTo >>> ", parsedResolveInfoFragment)
-                                const subIds: string[] = parent.subscribedToUser.map((s: { subscriberId: string, authorId: string }) => s.authorId)
-                                for (let sub of subIds) {
-                                    const subUser = await context.dataLoader.users.load(sub);
-                                    context.dataLoader.users.prime(sub, subUser);
-                                } */
-
                 return await context.dataLoader.userSubscribedTo.load(parent.id);
 
             }
@@ -40,18 +30,6 @@ export const UserType = new GraphQLObjectType({
         subscribedToUser: {
             type: new GraphQLList(UserType),
             async resolve(parent, args, context, info) {
-                /*                 const parsedResolveInfoFragment = parseResolveInfo(info);
-                                const fields = parsedResolveInfoFragment?.fieldsByTypeName
-                                console.log("parsedResolveInfoFragment subToUser >>> ", parsedResolveInfoFragment)
-                                console.log("fields ---------- ", fields);
-                                const subIds: string[] = parent.userSubscribedTo.map((s: { subscriberId: string, authorId: string }) => s.subscriberId)
-                                for (let sub of subIds) {
-                                    const subUser = await context.dataLoader.users.load(sub);
-                                    context.dataLoader.userSubscribedTo.prime(parent.id, parent.userSubscribedTo.push(sub));
-                                }
-                                console.log("PARENT subsIDs------>>> ", subIds) */
-
-
                 return await context.dataLoader.subscribedToUser.load(parent.id);
             }
         },

@@ -2,8 +2,6 @@ import { GraphQLObjectType, GraphQLList } from 'graphql'
 import { MemberTypeId } from '../types/memberTypeId.js'
 import { UUIDType } from '../types/uuid.js'
 import { UserType, PostType, ProfileType, MemberType } from '../graphQLSchemas.js'
-import { PrismaClient } from '@prisma/client'
-
 
 
 export const RootQuery = new GraphQLObjectType({
@@ -13,7 +11,6 @@ export const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(UserType),
             args: {},
             resolve: async (parent, args, context, info) => {
-
 
                 const requestedFields = info.fieldNodes[0].selectionSet?.selections.map(
                     (selection) => { if (selection.kind === "Field") { return selection.name.value } }
@@ -51,55 +48,7 @@ export const RootQuery = new GraphQLObjectType({
         user: {
             type: UserType,
             args: { id: { type: UUIDType } },
-            resolve: async (parent, args, context, info) => {
-
-                /*                 const requestedFields = info.fieldNodes[0].selectionSet?.selections.map(
-                                    (selection) => { if (selection.kind === "Field") { return selection.name.value } }
-                                );
-                
-                                console.log("requestedFields------>>> ", requestedFields)
-                                let response: ReturnType<typeof UserType>[];
-                                if (requestedFields?.includes('subscribedToUser') && requestedFields?.includes('userSubscribedTo')) {
-                                    response = await context.prisma.user.findUnique({
-                                        where: {
-                                            id: args.id,
-                                        },
-                                        include: {
-                                            subscribedToUser: true,
-                                            userSubscribedTo: true
-                                        }
-                                    })
-                                }
-                                else if (requestedFields?.includes('userSubscribedTo')) {
-                                    response = await context.prisma.user.findUnique({
-                                        where: {
-                                            id: args.id,
-                                        },
-                                        include: {
-                                            userSubscribedTo: true
-                                        }
-                                    })
-                                } else if (requestedFields?.includes('subscribedToUser')) {
-                                    response = await context.prisma.user.findUnique({
-                                        where: {
-                                            id: args.id,
-                                        },
-                                        include: {
-                                            subscribedToUser: true,
-                                        }
-                                    })
-                                }
-                                else {
-                                    response = await context.prisma.user.findUnique(
-                                        {
-                                            where: {
-                                                id: args.id,
-                                            },
-                                        }
-                                    )
-                                }
-                
-                                return response */
+            resolve: async (parent, args, context) => {
                 return await context.prisma.user.findUnique({
                     where: {
                         id: args.id,
@@ -166,7 +115,3 @@ export const RootQuery = new GraphQLObjectType({
 
     })
 })
-
-function getRightResponse(prisma: PrismaClient, requestedFields: string[]) {
-
-}
